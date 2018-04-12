@@ -17,10 +17,13 @@
     <div style="padding: 1.5rem;" class="form-group">
       <div>Cliente socket IO</div>
       Status conexão:
-      <div id="connection-status" class="badge">Desconectado</div>
+      <div id="connection-status" class="badge"></div>
       </br>
       Socket ID:
       <span id="socket-id"></span>
+      </br>
+      Socket List:
+      <span id="socket-list"></span>
       </br>
       <button class="btn btn-primary" id="btn-connect">Conectar</button>
       <button class="btn btn-secondary" id="btn-disconnect">Desconectar</button>
@@ -31,19 +34,27 @@
     $('#btn-connect').click(function () {
       socket = io.connect();
       $('#connection-status').addClass('badge-success')
-      console.log($('#socket-id'))
-      $('#socket-id').html('socket.id')
+      $('#connection-status').html('Conectado')
+      socket.on('socket.id.received', function (data) {
+        $('#socket-id').html(data.id)
+      });
       socket.on('news', function (data) {
         console.log(data);
-        socket.emit('my other event', { my: 'data' });
+      });
+      socket.on('socket.list', function (data) {
+        $('#socket-list').html(Object.keys(data.sockets).join('</br>'))
       });
     })
     $('#btn-disconnect').click(function () {
       socket.close()
-      $('#socket-id').html('')
-      $('#connection-status').removeClass('badge-success')
+      resetHTML()
     })
-
+    function resetHTML(){
+      $('#socket-id').html('')
+      $('#socket-list').html('')
+      $('#connection-status').html('Desconectado')
+      $('#connection-status').removeClass('badge-success')
+    }
   </script>
 </body>
 
