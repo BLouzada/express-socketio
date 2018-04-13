@@ -25,8 +25,12 @@
       Socket List:
       <span id="socket-list"></span>
       </br>
+      Último evento recebido:
+      <span id="last-event"></span>
+      </br>
       <button class="btn btn-primary" id="btn-connect">Conectar</button>
       <button class="btn btn-secondary" id="btn-disconnect">Desconectar</button>
+      <button class="btn btn-secondary" id="btn-emit-event">Server emite evento</button>
     <div>
   </main>
   <script>
@@ -36,13 +40,16 @@
       $('#connection-status').addClass('badge-success')
       $('#connection-status').html('Conectado')
       socket.on('socket.id.received', function (data) {
+        updateLastEvent(data)
         $('#socket-id').html(data.id)
       });
-      socket.on('news', function (data) {
-        console.log(data);
-      });
       socket.on('socket.list', function (data) {
+        updateLastEvent(data)
         $('#socket-list').html(Object.keys(data.sockets).join('</br>'))
+      });
+      socket.on('new.event', function (data) {
+        updateLastEvent(data)
+        console.log(data);
       });
     })
     $('#btn-disconnect').click(function () {
@@ -55,6 +62,12 @@
       $('#connection-status').html('Desconectado')
       $('#connection-status').removeClass('badge-success')
     }
+    function updateLastEvent(data){
+      $('#last-event').html(JSON.stringify(data, null, 2))
+    }
+    $('#btn-emit-event').click(function(){
+      $.get("emit-event");
+    })
   </script>
 </body>
 
